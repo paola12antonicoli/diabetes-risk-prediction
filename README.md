@@ -21,7 +21,7 @@ This profile is a reorganized version of my previous academic GitHub portfolio, 
 
 ## Featured project
 
-### [Healthcare AI & Machine Learning](./healthcare-ai-ml)
+### [Diabetes risk prediction](./healthcare-ai-ml)
 
 End-to-end diabetes risk prediction using the CDC Diabetes Health Indicators dataset. Covers data loading and quality checks, exploratory analysis, preprocessing pipelines, model training and comparison (Logistic Regression, Random Forest, Gradient Boosting), threshold tuning for healthcare-specific trade-offs, and SHAP-based interpretability.
 
