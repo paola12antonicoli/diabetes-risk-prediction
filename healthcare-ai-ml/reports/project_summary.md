@@ -58,22 +58,23 @@ Model comparison on the test set (threshold = 0.5):
 
 | Model | Accuracy | Precision | Recall | F1 | ROC-AUC |
 |-------|----------|-----------|--------|----|---------|
-| Logistic Regression | ~0.82 | ~0.55 | ~0.48 | ~0.51 | ~0.78 |
-| Random Forest | ~0.85 | ~0.62 | ~0.56 | ~0.59 | ~0.81 |
-| **Gradient Boosting** | **~0.87** | **~0.65** | **~0.61** | **~0.63** | **~0.84** |
+| Logistic Regression | 0.8621 | 0.5164 | 0.1584 | 0.2425 | 0.8192 |
+| Random Forest | 0.8594 | 0.4879 | 0.1913 | 0.2748 | 0.7948 |
+| **Gradient Boosting** | **0.8647** | **0.5461** | **0.1702** | **0.2595** | **0.8264** |
 
-Gradient Boosting performs best on recall and ROC-AUC — the metrics that matter most for a screening-type task where missing positive cases is costly.
+Gradient Boosting has the strongest overall ROC-AUC and accuracy at the default threshold. However, recall remains low at threshold 0.5, which is important for a screening-type task where missed positive cases are costly.
 
 ### Threshold tuning (Gradient Boosting)
 
 | Threshold | Recall | Precision | Notes |
 |-----------|--------|-----------|-------|
-| 0.3 | ~0.72 | ~0.45 | High sensitivity, more false alarms |
-| 0.4 | ~0.63 | ~0.53 | Good balance for screening |
-| 0.5 | ~0.61 | ~0.65 | Default |
-| 0.7 | ~0.38 | ~0.75 | High precision, misses more cases |
+| 0.3 | 0.4671 | 0.4312 | Higher sensitivity, more false alarms |
+| 0.4 | 0.3036 | 0.4857 | Intermediate balance |
+| 0.5 | 0.1702 | 0.5461 | Default |
+| 0.6 | 0.0743 | 0.6098 | Higher precision, lower sensitivity |
+| 0.7 | 0.0137 | 0.7293 | Very high precision, misses most positive cases |
 
-For a population-level risk flagging scenario, a threshold of 0.4 offers a reasonable balance between catching at-risk individuals and avoiding alert fatigue.
+For a population-level risk flagging scenario, lowering the threshold increases recall, but the current model still shows a substantial precision-recall trade-off. A threshold around 0.3 may be preferable when catching more at-risk individuals matters more than avoiding false positives.
 
 ---
 
