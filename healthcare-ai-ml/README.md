@@ -1,6 +1,6 @@
 # Healthcare AI & Machine Learning
 
-A recruiter-friendly healthcare machine learning project for diabetes risk prediction using the CDC Diabetes Health Indicators dataset.
+Healthcare machine learning project for diabetes risk prediction using the CDC Diabetes Health Indicators dataset.
 
 This project is a data science exercise focused on data preparation, exploratory analysis, model development, and interpretability. It is presented as a healthcare risk prediction study, not a medical diagnostic tool.
 
