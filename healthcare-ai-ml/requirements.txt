@@ -1,8 +1,10 @@
-pandas
-numpy
-scikit-learn
-matplotlib
-seaborn
+pandas>=1.4
+numpy>=1.22
+scikit-learn>=1.2
+matplotlib>=3.5
+seaborn>=0.12
 ucimlrepo
 joblib
 shap
+jupyter
+ipykernel

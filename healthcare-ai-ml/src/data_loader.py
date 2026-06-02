@@ -6,32 +6,27 @@ import pandas as pd
 
 
 def load_cdc_diabetes_data() -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame]:
-    """Fetch the CDC Diabetes Health Indicators dataset and return X, y, and full dataframe.
+    """Fetch the CDC Diabetes Health Indicators dataset and return (X, y, df).
 
-    This function uses the ucimlrepo package to retrieve the CDC Diabetes dataset.
-    If the UCI repo is unavailable, it will use a local sample file if present.
+    Tries the UCI ML Repository first; falls back to a local sample CSV if
+    the network request fails or the package is not installed.
     """
-    from pathlib import Path
-    
-    # Try UCI repo first
     try:
         from ucimlrepo import fetch_ucirepo
     except ImportError:
         return _load_sample_data()
 
     try:
-        dataset = fetch_ucirepo('CDC Diabetes Health Indicators')
+        dataset = fetch_ucirepo("CDC Diabetes Health Indicators")
+        df = _assemble_dataframe(dataset)
     except Exception:
-        # Fallback to sample data if UCI fetch fails
         return _load_sample_data()
 
-    df = _assemble_dataframe(dataset)
     target_column = _find_target_column(df)
-
     if target_column is None:
         raise ValueError(
-            "Unable to identify the diabetes target column in the dataset. "
-            "Expected a column such as 'Diabetes_binary'."
+            "Could not identify the diabetes target column. "
+            "Expected a column named 'Diabetes_binary'."
         )
 
     y = df[target_column].copy()
@@ -40,102 +35,75 @@ def load_cdc_diabetes_data() -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame]:
 
 
 def _assemble_dataframe(dataset) -> pd.DataFrame:
-    """Convert the dataset object returned by ucimlrepo to a pandas DataFrame."""
-    if hasattr(dataset, "frame") and dataset.frame is not None:
-        return dataset.frame.copy()
+    """Convert a ucimlrepo dataset object to a single pandas DataFrame."""
+    data = getattr(dataset, "data", None)
 
-    if hasattr(dataset, "data") and hasattr(dataset, "target"):
-        data = dataset.data
-        target = dataset.target
-
-        if isinstance(data, pd.DataFrame):
-            df = data.copy()
-        else:
-            df = pd.DataFrame(data)
-
-        df[target_column_name(df, target)] = pd.Series(target)
+    # Preferred path: pre-assembled original DataFrame from ucimlrepo >= 0.0.3
+    if data is not None and hasattr(data, "original") and isinstance(data.original, pd.DataFrame):
+        df = data.original.copy()
+        # Drop the surrogate ID column added by ucimlrepo, if present
+        if "ID" in df.columns and df["ID"].is_unique:
+            df = df.drop(columns=["ID"])
         return df
 
+    # Fallback: concatenate features + targets DataFrames
+    if data is not None and hasattr(data, "features") and hasattr(data, "targets"):
+        features: pd.DataFrame = data.features
+        targets: pd.DataFrame = data.targets
+        if isinstance(features, pd.DataFrame) and isinstance(targets, pd.DataFrame):
+            return pd.concat([features.reset_index(drop=True), targets.reset_index(drop=True)], axis=1)
+
+    # Last resort: try treating dataset itself as a DataFrame
     if isinstance(dataset, pd.DataFrame):
         return dataset.copy()
 
-    if isinstance(dataset, dict):
-        data = dataset.get("data")
-        if data is None:
-            raise ValueError("Dataset dict does not contain 'data'.")
-        df = pd.DataFrame(data)
-        target = dataset.get("target")
-        if target is not None:
-            df[target_column_name(df, target)] = pd.Series(target)
-        return df
-
     raise TypeError(
-        "Unexpected dataset format returned by ucimlrepo.fetch_dataset."
+        f"Unrecognised dataset format returned by ucimlrepo: {type(dataset)}. "
+        "Update ucimlrepo or use a local CSV file."
     )
 
 
-def target_column_name(df: pd.DataFrame, target) -> str:
-    """Choose a default target column name when assembling the dataset."""
-    if isinstance(target, pd.Series) and target.name:
-        return target.name
-
-    known_names = ["Diabetes_binary", "diabetes_binary", "diabetes"]
-    for name in known_names:
-        if name in df.columns:
-            return name
-
-    return "Diabetes_binary"
-
-
 def _find_target_column(df: pd.DataFrame) -> Optional[str]:
-    """Identify the target column within the assembled DataFrame."""
-    candidates = [
-        "Diabetes_binary",
-        "diabetes_binary",
-        "Diabetes",
-        "diabetes",
-        "target",
-    ]
-    for candidate in candidates:
-        if candidate in df.columns:
-            return candidate
+    """Return the name of the diabetes target column, or None if not found."""
+    candidates = ["Diabetes_binary", "diabetes_binary", "Diabetes", "diabetes", "target"]
+    for col in candidates:
+        if col in df.columns:
+            return col
     return None
 
 
 def _load_sample_data() -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame]:
-    """Load sample diabetes data from a CSV file when UCI repo is unavailable.
-    
-    This is used as a fallback when the UCI ML Repository cannot be reached.
-    In production, use load_cdc_diabetes_data() with a working internet connection.
+    """Load a small sample from the local CSV fallback.
+
+    Used when ucimlrepo is unavailable or the network request fails.
     """
     from pathlib import Path
-    
-    # Try to load from local sample file
+
     sample_path = Path(__file__).parent.parent / "sample_cdc_diabetes.csv"
     if sample_path.exists():
         df = pd.read_csv(sample_path)
     else:
-        # Create a minimal sample in memory
         import numpy as np
-        np.random.seed(42)
+
+        rng = np.random.default_rng(42)
         n = 500
         df = pd.DataFrame({
-            'Age': np.random.randint(18, 80, n),
-            'BMI': np.random.normal(27, 5, n).clip(10, 60),
-            'HighBP': np.random.binomial(1, 0.4, n),
-            'HighChol': np.random.binomial(1, 0.5, n),
-            'PhysActivity': np.random.binomial(1, 0.7, n),
-            'GenHlth': np.random.randint(1, 6, n),
-            'MentHlth': np.random.randint(0, 31, n),
-            'PhysHlth': np.random.randint(0, 31, n),
-            'Income': np.random.randint(1, 9, n),
-            'Diabetes_binary': np.random.binomial(1, 0.15, n),
+            "Age": rng.integers(1, 14, n),
+            "BMI": rng.normal(27, 5, n).clip(10, 60),
+            "HighBP": rng.integers(0, 2, n),
+            "HighChol": rng.integers(0, 2, n),
+            "PhysActivity": rng.integers(0, 2, n),
+            "GenHlth": rng.integers(1, 6, n),
+            "MentHlth": rng.integers(0, 31, n),
+            "PhysHlth": rng.integers(0, 31, n),
+            "Income": rng.integers(1, 9, n),
+            "Diabetes_binary": rng.binomial(1, 0.15, n),
         })
-    
+
     target_column = _find_target_column(df)
     if target_column is None:
-        raise ValueError("Cannot find target column in sample data")
-    
+        raise ValueError("Cannot identify target column in fallback sample data.")
+
     y = df[target_column].copy()
     X = df.drop(columns=[target_column]).copy()
     return X, y, df

@@ -5,3 +5,5 @@ __pycache__/
 .DS_Store
 models/*.pkl
 models/*.joblib
+# Note: model artifacts are excluded because the Random Forest serialised file
+# exceeds GitHub's 100MB limit. Re-run the notebooks to regenerate them.

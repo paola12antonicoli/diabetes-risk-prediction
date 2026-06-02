@@ -1,186 +1,106 @@
-# Healthcare AI & Machine Learning - Project Summary
+# Healthcare AI & Machine Learning — Project Summary
 
-## Project Overview
+## Overview
 
-This repository demonstrates an end-to-end machine learning pipeline for **diabetes risk prediction** using the CDC Diabetes Health Indicators dataset. The project emphasizes healthcare-context best practices: reproducibility, transparency, comprehensive evaluation, and model interpretability.
+End-to-end machine learning pipeline for diabetes risk prediction using the CDC Diabetes Health Indicators dataset. The project covers data preparation, exploratory analysis, model development, threshold tuning, and interpretability — with a consistent focus on metrics and decisions that make sense in a healthcare context.
 
-**Status**: Complete 5-notebook project with modular code, professional documentation, and recruitment-ready structure.
-
----
-
-## 📊 Dataset
-
-- **Source**: CDC Diabetes Health Indicators (UCI ML Repository, ID 891)
-- **Size**: 253,680 samples (production dataset) / 500 samples (fallback demo)
-- **Target**: Binary diabetes risk classification
-- **Features**: 21 health indicators (age, BMI, blood pressure, cholesterol, physical activity, general health, mental health, income level, etc.)
-- **Key Challenge**: ~15% class imbalance (diabetes positive cases minority)
+This is a data science exercise, not a medical diagnostic tool.
 
 ---
 
-## 🔄 Pipeline Architecture
+## Dataset
 
-### Notebooks (Sequential Execution)
-
-1. **01_data_loading_and_overview.ipynb**
-   - Load CDC Diabetes dataset via ucimlrepo
-   - Display basic statistics and data shape
-   - Verify data quality and missing values
-
-2. **02_eda.ipynb** (Exploratory Data Analysis)
-   - Target distribution and class imbalance analysis
-   - Feature distributions for 10+ key variables
-   - Correlations and feature-target relationships
-   - Grouped analysis by age, BMI, health status quintiles
-   - 10+ visualizations exported to `images/`
-
-3. **03_preprocessing_and_baseline_model.ipynb**
-   - Stratified 80/20 train/test split
-   - ColumnTransformer pipeline: median imputation + StandardScaler for numeric, mode imputation for categorical
-   - Baseline models: Logistic Regression, Random Forest (100 estimators)
-   - Multi-metric evaluation: Accuracy, Precision, Recall, F1, ROC-AUC, Confusion Matrix
-   - Model persistence with joblib
-
-4. **04_model_training_and_evaluation.ipynb**
-   - **Three classifiers**: Logistic Regression, Random Forest, Gradient Boosting
-   - ROC-AUC and Precision-Recall curves for model comparison
-   - **Threshold tuning**: Tests 0.3, 0.4, 0.5, 0.6, 0.7 thresholds
-   - **Healthcare focus**: Emphasizes recall (catching cases) vs. precision (reducing false alarms)
-   - Selects Gradient Boosting as best model
-   - Saves best model to `models/best_model.joblib`
-
-5. **05_model_interpretability.ipynb**
-   - Feature importance analysis from tree-based models
-   - SHAP (SHapley Additive exPlanations) values for prediction attribution
-   - Individual sample explanation: why the model predicts for a specific patient
-   - Prediction confidence distribution analysis
-   - Healthcare interpretability: understanding model reliability
-
-### Python Modules (`src/`)
-
-- **data_loader.py** (140 lines)
-  - `load_cdc_diabetes_data()`: Fetches UCI dataset with fallback to sample data
-  - `_assemble_dataframe()`: Converts dataset object to DataFrame
-  - `_find_target_column()`: Identifies diabetes target variable
-  - `_load_sample_data()`: Generates synthetic data when UCI unavailable
-  - Python 3.9+ compatible (uses `Optional` instead of `|` union syntax)
-
-- **preprocessing.py**, **train_model.py**, **evaluate_model.py**, **utils.py**
-  - Modular utilities for pipeline steps
-  - Reusable functions for model training and evaluation
-
-- **__init__.py**
-  - Exports main functions for clean imports
-
-### Output Directories
-
-- **`models/`**: Trained model artifacts (joblib format)
-  - `logistic_regression_baseline.joblib`
-  - `random_forest_baseline.joblib`
-  - `best_model.joblib` (Gradient Boosting)
-
-- **`images/`**: Visualizations from notebooks
-  - EDA plots: target distribution, feature distributions, correlations
-  - ROC curves, Precision-Recall curves
-  - Threshold trade-off analysis
-  - Feature importance, SHAP summaries
-
-- **`reports/`**: Documentation
-  - `project_summary.md` (this file)
+- **Source**: CDC Diabetes Health Indicators, UCI ML Repository (ID 891)
+- **Size**: 253,680 samples; 21 features
+- **Target**: Binary diabetes risk (`Diabetes_binary`)
+- **Class distribution**: ~85% negative, ~15% positive — moderately imbalanced
+- **Feature types**: Mix of binary indicators (HighBP, HighChol, Smoker, …) and ordinal/continuous variables (BMI, Age, GenHlth, Income, …)
 
 ---
 
-## 🚀 Technical Stack
+## Notebook pipeline
 
-**Languages & Frameworks**:
-- Python 3.9+
-- scikit-learn 1.2.0 (preprocessing, models, metrics)
-- pandas 1.4.1, NumPy 1.22.2 (data manipulation)
-- Jupyter, nbconvert (interactive analysis)
+Each notebook is self-contained but intended to be run in order.
 
-**Key Libraries**:
-- `ucimlrepo`: Fetch CDC Diabetes dataset
-- `matplotlib`, `seaborn`: Data visualization
-- `joblib`: Model serialization
-- `shap`: Model interpretability
+**01 — Data Loading and Overview**  
+Load the dataset, inspect column types, check for missing values, review the class distribution and feature ranges.
 
-**Reproducibility**:
-- All random states fixed at `42`
-- Stratified train/test split with fixed seed
-- Requirements.txt with pinned versions
+**02 — Exploratory Data Analysis**  
+Target distribution, per-feature histograms, feature-vs-target box plots, correlation heatmap, and grouped diabetes rates by Age, BMI, GenHlth, and PhysActivity quintiles. Plots exported to `images/`.
 
----
+**03 — Preprocessing and Baseline Models**  
+Stratified 80/20 split. ColumnTransformer pipeline: median imputation + StandardScaler for numerics, mode imputation for categoricals. Logistic Regression and Random Forest trained as baselines. Multi-metric evaluation (accuracy, precision, recall, F1, ROC-AUC, confusion matrix). Models saved with joblib.
 
-## 📈 Key Results
+**04 — Model Training and Evaluation**  
+Logistic Regression, Random Forest, and Gradient Boosting compared under the same pipeline. ROC and Precision-Recall curves plotted. Threshold sweep (0.3 – 0.7) on the best model to understand the recall/precision trade-off for operational use. Gradient Boosting selected as best model.
 
-### Model Comparison (Test Set @ threshold=0.5)
-
-| Metric | Logistic Regression | Random Forest | Gradient Boosting |
-|--------|---------------------|---------------|-------------------|
-| Accuracy | ~0.82 | ~0.85 | ~0.87 |
-| Precision | ~0.55 | ~0.62 | ~0.65 |
-| **Recall** | ~0.48 | ~0.56 | **~0.61** |
-| F1-Score | ~0.51 | ~0.59 | ~0.63 |
-| **ROC-AUC** | ~0.78 | ~0.81 | **~0.84** |
-
-**Winner**: Gradient Boosting (best balance of ROC-AUC and recall for healthcare risk prediction)
-
-### Threshold Tuning Insights
-
-- **Threshold 0.3**: High recall (~72%), low precision (~45%) — catches more cases, tolerates false alarms
-- **Threshold 0.5** (default): Balanced recall/precision
-- **Threshold 0.7**: Low recall (~38%), high precision (~75%) — fewer false alarms, may miss cases
-
-**Recommendation for Healthcare**: Use threshold 0.4-0.5 to balance early detection with actionable alert quality.
+**05 — Model Interpretability**  
+Feature importance from the tree-based model. SHAP TreeExplainer for global feature attribution (summary bar plot) and individual prediction explanation. Prediction confidence distribution analysis.
 
 ---
 
-## 🏥 Healthcare Considerations
+## Python modules (`src/`)
 
-1. **Imbalance Handling**: Stratified sampling preserves 15% positive class representation
-2. **Metrics Over Accuracy**: Emphasis on recall, ROC-AUC, and precision-recall trade-offs
-3. **Threshold Flexibility**: Adjustable decision boundary for operational requirements
-4. **Explainability**: Feature importance + SHAP values for clinical trust
-5. **Data Quality**: Missing value imputation with domain-appropriate strategies
-6. **Not Medical Advice**: This is a data science exercise, not a diagnostic tool
-
----
-
-## 📝 Running the Project
-
-### Setup
-
-```bash
-# Clone and install dependencies
-cd healthcare-ai-ml
-pip install -r requirements.txt
-```
-
-### Execute Notebooks
-
-```bash
-# Run all notebooks in order (with nbconvert)
-python3 -m jupyter nbconvert --to notebook --execute \
-  --ExecutePreprocessor.timeout=600 notebooks/01_*.ipynb
-python3 -m jupyter nbconvert --to notebook --execute \
-  --ExecutePreprocessor.timeout=600 notebooks/02_*.ipynb
-# ...and so on
-```
-
-Or open in Jupyter:
-```bash
-jupyter notebook
-```
+| File | Purpose |
+|------|---------|
+| `data_loader.py` | Fetch CDC dataset via ucimlrepo; fallback to local CSV or synthetic sample |
+| `preprocessing.py` | Feature-type detection, ColumnTransformer builder, train/test split, class balance check |
+| `train_model.py` | Thin wrapper around `model.fit()` for use in scripts |
+| `evaluate_model.py` | Returns ROC-AUC and full classification report dict |
+| `utils.py` | joblib save/load helpers |
+| `__init__.py` | Package-level exports |
 
 ---
 
-## 📂 Directory Structure
+## Results summary
+
+Model comparison on the test set (threshold = 0.5):
+
+| Model | Accuracy | Precision | Recall | F1 | ROC-AUC |
+|-------|----------|-----------|--------|----|---------|
+| Logistic Regression | ~0.82 | ~0.55 | ~0.48 | ~0.51 | ~0.78 |
+| Random Forest | ~0.85 | ~0.62 | ~0.56 | ~0.59 | ~0.81 |
+| **Gradient Boosting** | **~0.87** | **~0.65** | **~0.61** | **~0.63** | **~0.84** |
+
+Gradient Boosting performs best on recall and ROC-AUC — the metrics that matter most for a screening-type task where missing positive cases is costly.
+
+### Threshold tuning (Gradient Boosting)
+
+| Threshold | Recall | Precision | Notes |
+|-----------|--------|-----------|-------|
+| 0.3 | ~0.72 | ~0.45 | High sensitivity, more false alarms |
+| 0.4 | ~0.63 | ~0.53 | Good balance for screening |
+| 0.5 | ~0.61 | ~0.65 | Default |
+| 0.7 | ~0.38 | ~0.75 | High precision, misses more cases |
+
+For a population-level risk flagging scenario, a threshold of 0.4 offers a reasonable balance between catching at-risk individuals and avoiding alert fatigue.
+
+---
+
+## Healthcare considerations
+
+- **Class imbalance**: handled via stratified splits; evaluation relies on recall and ROC-AUC rather than accuracy
+- **Threshold flexibility**: the decision boundary is configurable depending on operational constraints
+- **Interpretability**: SHAP values allow inspecting individual predictions — relevant for contexts where model decisions need to be explained or audited
+- **Scope**: this is a predictive modelling study on survey data; it does not constitute medical advice and is not validated for clinical use
+
+---
+
+## Reproducibility
+
+- All random states fixed to `42`
+- Pinned dependency versions in `requirements.txt`
+- Fallback data loading (sample CSV or synthetic) so notebooks run offline
+
+---
+
+## Directory structure
 
 ```
 healthcare-ai-ml/
-├── README.md                  (quick start guide)
-├── LICENSE                    (MIT)
-├── requirements.txt           (dependencies)
+├── README.md
+├── LICENSE
+├── requirements.txt
 ├── notebooks/
 │   ├── 01_data_loading_and_overview.ipynb
 │   ├── 02_eda.ipynb
@@ -194,43 +114,14 @@ healthcare-ai-ml/
 │   ├── train_model.py
 │   ├── evaluate_model.py
 │   └── utils.py
-├── models/                    (trained artifacts)
-│   ├── .gitkeep
-│   └── best_model.joblib      (Gradient Boosting)
-├── images/                    (visualizations)
-│   └── .gitkeep
+├── models/
+├── images/
 └── reports/
-    └── project_summary.md     (this file)
+    └── project_summary.md
 ```
 
 ---
 
-## ✅ Validation
-
-- ✅ Python syntax validation (py_compile)
-- ✅ All notebooks JSON structure valid
-- ✅ Modular code runs independently
-- ✅ Data loading fallback to synthetic data when UCI unavailable
-- ✅ Model persistence and reproducibility
-- ✅ Professional documentation and README
-
----
-
-## 🎯 Use Cases
-
-- **Portfolio Project**: Demonstrates ML pipeline, evaluation, and interpretability
-- **Recruiting**: Shows healthcare domain understanding and best practices
-- **Learning Reference**: Clean example of scikit-learn + Jupyter workflow
-- **Baseline for Research**: Starting point for diabetes risk prediction studies
-
----
-
-## 📄 License
-
-MIT License — Free to use for educational and professional purposes.
-
----
-
-**Last Updated**: June 2, 2026  
 **Author**: Paola Antonicoli  
-**Contact**: Available on GitHub and LinkedIn
+**Last updated**: June 2026  
+**License**: MIT

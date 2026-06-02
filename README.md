@@ -1,71 +1,34 @@
 # Paola Antonicoli
 
-Data & AI Consultant with an academic background in Data Science and Management Engineering. I build practical, interpretable and reliable data-driven solutions, with a focus on Healthcare AI, Machine Learning, Business Intelligence and Data Analytics.
+Data & AI Consultant with an academic background in Data Science and Management Engineering. I build practical, interpretable, and reliable data-driven solutions, with a focus on Healthcare AI, Machine Learning, Business Intelligence, and Data Analytics.
 
-This profile is a refreshed version of my previous academic GitHub portfolio, originally linked to a university email account that is no longer active. I am progressively reorganizing and documenting selected projects here.
+This profile is a reorganized version of my previous academic GitHub portfolio, originally linked to a university email that is no longer active. I'm progressively documenting selected projects here — fewer repos, but complete and well-maintained ones.
 
-## Main interests
+## Interests
 
-- Healthcare AI
-- Machine Learning
-- Deep Learning
-- Clinical Data Analysis
-- Business Intelligence
-- Data Pipelines
-- Data Visualization
-- Interpretable AI
-- Computer Vision
+- Healthcare AI and clinical data analysis
+- Interpretable and reliable machine learning
+- Deep Learning and Computer Vision
 - NLP
+- Business Intelligence and data pipelines
 
 ## Technical skills
 
-- Python
-- PyTorch
-- pandas
-- scikit-learn
-- SQL
-- R
-- Power BI
-- Microsoft Analysis Services
-- SQL Server Integration Services
-- Data Visualization
-- Machine Learning
-- Deep Learning
+**Languages**: Python, SQL, R  
+**ML / DL**: scikit-learn, PyTorch, pandas, NumPy  
+**BI & Reporting**: Power BI, Microsoft Analysis Services, SQL Server Integration Services  
+**Other**: Data Visualization, Jupyter, joblib, SHAP
 
 ## Featured project
 
-### Healthcare AI & Machine Learning
-A healthcare-focused data science project involving data preprocessing, exploratory analysis, machine learning or deep learning models, and interpretation of results for clinical or operational decision-making.
+### [Healthcare AI & Machine Learning](./healthcare-ai-ml)
 
-- Tech stack: Python, pandas, scikit-learn, PyTorch, SQL, data visualization, healthcare analytics
-- Demonstrates:
-  - ability to work with complex healthcare-related data
-  - data cleaning and preprocessing
-  - exploratory data analysis
-  - machine learning and deep learning model development
-  - interpretation of results
-  - attention to reliability, explainability and practical usefulness
-  - awareness of real-world healthcare constraints
+End-to-end diabetes risk prediction using the CDC Diabetes Health Indicators dataset. Covers data loading and quality checks, exploratory analysis, preprocessing pipelines, model training and comparison (Logistic Regression, Random Forest, Gradient Boosting), threshold tuning for healthcare-specific trade-offs, and SHAP-based interpretability.
 
-[Repository](#) | [Documentation](#)
-
-## Currently working on
-
-- Building and documenting my first flagship healthcare AI project
-- Improving repository structure and documentation
-- Adding notebooks, visualizations and reproducible examples
-- Creating a portfolio focused on selected, well-documented projects rather than many incomplete repos
-
-## Portfolio roadmap
-
-- Complete the healthcare project repository
-- Add clear README documentation
-- Add sample notebooks
-- Add visual outputs and model evaluation summaries
-- Add reproducible examples
-- Later add selected side projects only when they are mature enough
+**Stack**: Python, scikit-learn, pandas, matplotlib/seaborn, SHAP  
+**Highlights**: stratified evaluation, precision-recall trade-off analysis, feature attribution with SHAP, modular `src/` package, reproducible Jupyter notebooks
 
 ## Contact
 
-- LinkedIn: [LinkedIn](#)
-- Email: [Email](mailto:your.email@example.com)
+- LinkedIn: [linkedin.com/in/paolaantonicoli](https://linkedin.com/in/paolaantonicoli)
+- Email: paola12antonicoli@gmail.com
